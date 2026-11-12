@@ -1,84 +1,256 @@
-<div class="min-h-screen flex items-center justify-center bg-dark-bg p-4 relative overflow-hidden">
-    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-cyan-accent/15 rounded-full blur-[120px]"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-600/15 rounded-full blur-[120px]"></div>
+<div class="min-h-screen bg-dark-bg text-white relative overflow-x-hidden">
+    <!-- EFECTOS DE ILUMINACIÓN DE FONDO -->
+    <div class="pointer-events-none fixed top-[-15%] left-[-10%] w-[500px] h-[500px] bg-cyan-accent/10 rounded-full blur-[130px]"></div>
+    <div class="pointer-events-none fixed bottom-[-15%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[130px]"></div>
   
-    <div class="max-w-md w-full bg-dark-panel/90 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl relative z-10">
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-white mb-1">Portal de <span class="text-cyan-accent">Pacientes</span></h1>
-        <p class="text-sm text-gray-400">Accede a tus citas y notificaciones SaaS</p>
-      </div>
-  
-      <!-- PESTAÑAS INGRESAR / CREAR CUENTA -->
-      <div class="grid grid-cols-2 bg-[#0f172a] p-1 rounded-xl mb-6 border border-gray-800">
-        <button type="button" (click)="alternarModo(false)"
-                [ngClass]="!modoRegistro ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white'"
-                class="py-2 rounded-lg text-sm transition-all">
-          Ingresar
-        </button>
-        <button type="button" (click)="alternarModo(true)"
-                [ngClass]="modoRegistro ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white'"
-                class="py-2 rounded-lg text-sm transition-all">
-          Crear Cuenta
-        </button>
-      </div>
-  
-      <!-- FORMULARIO DE INICIO DE SESIÓN -->
-      <form *ngIf="!modoRegistro" (ngSubmit)="onLogin()" class="space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">CURP (Usuario)</label>
-          <input type="text" [(ngModel)]="curpLogin" name="curpLogin" placeholder="Ej. LOSM060520HMCPNCA0"
-                 class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white uppercase focus:outline-none focus:border-cyan-accent transition-colors">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
-          <input type="password" [(ngModel)]="passwordLogin" name="passwordLogin" placeholder="••••••••••"
-                 class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-accent transition-colors">
-        </div>
-        <button type="submit" [disabled]="cargando"
-                class="w-full bg-cyan-accent text-dark-bg font-bold rounded-lg px-4 py-3 hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(0,229,255,0.25)] disabled:opacity-50">
-          {{ cargando ? 'Conectando...' : 'Ingresar al Portal' }}
-        </button>
-      </form>
-  
-      <!-- FORMULARIO DE REGISTRO -->
-      <form *ngIf="modoRegistro" (ngSubmit)="onRegister()" class="space-y-4">
-        <div>
-          <label class="block text-xs font-medium text-gray-300 mb-1">Nombre Completo</label>
-          <input type="text" [(ngModel)]="registro.nombre_completo" name="nombre" placeholder="Ej. Michael López Sánchez"
-                 class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-300 mb-1">CURP</label>
-          <input type="text" [(ngModel)]="registro.curp" name="curpReg" placeholder="18 caracteres"
-                 class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm uppercase focus:outline-none focus:border-cyan-accent">
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-medium text-gray-300 mb-1">Teléfono</label>
-            <input type="text" [(ngModel)]="registro.telefono" name="telefono" placeholder="7221234567"
-                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="sticky top-0 z-30 bg-dark-bg/80 backdrop-blur-md border-b border-gray-800/80">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-cyan-accent/15 border border-cyan-accent/40 flex items-center justify-center text-cyan-accent font-bold text-lg">
+            ✚
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-300 mb-1">Correo Gmail</label>
-            <input type="email" [(ngModel)]="registro.email" name="email" placeholder="correo@gmail.com"
-                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+            <span class="font-bold text-lg tracking-tight">Clínica <span class="text-cyan-accent">Cloud</span></span>
+            <span class="hidden sm:inline-block ml-2 text-[11px] bg-cyan-accent/10 text-cyan-accent px-2 py-0.5 rounded-full border border-cyan-accent/20">
+              Atención Médica Digital
+            </span>
           </div>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-300 mb-1">Crea una Contraseña</label>
-          <input type="password" [(ngModel)]="registro.password" name="passReg" placeholder="••••••••"
-                 class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+  
+        <nav class="hidden md:flex items-center gap-6 text-sm text-gray-400">
+          <a href="#especialidades" class="hover:text-cyan-accent transition-colors">Especialidades</a>
+          <a href="#opiniones" class="hover:text-cyan-accent transition-colors">Opiniones</a>
+          <a href="#faq" class="hover:text-cyan-accent transition-colors">Preguntas Frecuentes</a>
+        </nav>
+  
+        <div class="flex items-center gap-2">
+          <button (click)="alternarModo(false)" class="text-xs sm:text-sm text-gray-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors">
+            Ingresar
+          </button>
+          <button (click)="alternarModo(true)" class="text-xs sm:text-sm bg-cyan-accent text-dark-bg font-bold px-3.5 py-1.5 rounded-lg hover:bg-cyan-400 transition-colors">
+            Crear Cuenta
+          </button>
         </div>
-        <button type="submit" [disabled]="cargando"
-                class="w-full bg-cyan-accent text-dark-bg font-bold rounded-lg px-4 py-3 hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(0,229,255,0.25)] disabled:opacity-50">
-          {{ cargando ? 'Creando cuenta...' : 'Crear Cuenta' }}
-        </button>
-      </form>
-    </div>
+      </div>
+    </header>
+  
+    <!-- SECCIÓN PRINCIPAL (HERO + FORMULARIO DE ACCESO) -->
+    <section class="max-w-6xl mx-auto px-6 pt-10 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
+      <!-- COLUMNA IZQUIERDA: CONFIANZA E INFORMACIÓN -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 bg-dark-panel border border-gray-800 rounded-full px-4 py-1.5 text-xs text-cyan-accent">
+          <span class="w-2 h-2 rounded-full bg-cyan-accent animate-pulse"></span>
+          Citas en línea con confirmación inmediata a tu Gmail
+        </div>
+  
+        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
+          Tu salud en manos expertas, <span class="text-cyan-accent">sin filas ni esperas.</span>
+        </h1>
+  
+        <p class="text-gray-400 text-base sm:text-lg max-w-xl leading-relaxed">
+          Crea tu expediente digital con tu CURP, elige el horario que mejor se adapte a tu día y recibe tu pase de consulta directamente en tu correo electrónico.
+        </p>
+  
+        <!-- INDICADORES DE CONFIANZA -->
+        <div class="grid grid-cols-3 gap-4 pt-2 max-w-xl">
+          <div class="bg-dark-panel/80 border border-gray-800 rounded-xl p-4">
+            <div class="text-2xl font-bold text-white">4.9 <span class="text-yellow-400 text-lg">★</span></div>
+            <div class="text-xs text-gray-400 mt-1">Satisfacción de pacientes</div>
+          </div>
+          <div class="bg-dark-panel/80 border border-gray-800 rounded-xl p-4">
+            <div class="text-2xl font-bold text-cyan-accent">+2,400</div>
+            <div class="text-xs text-gray-400 mt-1">Consultas atendidas</div>
+          </div>
+          <div class="bg-dark-panel/80 border border-gray-800 rounded-xl p-4">
+            <div class="text-2xl font-bold text-white">24/7</div>
+            <div class="text-xs text-gray-400 mt-1">Agenda digital activa</div>
+          </div>
+        </div>
+  
+        <!-- TARJETA RÁPIDA DE ESPECIALIDADES INTERACTIVA -->
+        <div class="bg-dark-panel/60 border border-gray-800 rounded-2xl p-5 max-w-xl">
+          <div class="text-xs uppercase tracking-wider text-gray-400 mb-3">Explora nuestras áreas médicas</div>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button *ngFor="let esp of especialidades" type="button" (click)="seleccionarEspecialidad(esp)"
+                    [ngClass]="especialidadActiva.nombre === esp.nombre ? 'bg-cyan-accent/20 text-cyan-accent border-cyan-accent' : 'bg-[#0f172a] text-gray-400 border-gray-800 hover:border-gray-600'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5">
+              <span>{{ esp.icono }}</span> {{ esp.nombre }}
+            </button>
+          </div>
+          <div class="bg-[#0f172a]/90 border border-gray-800/80 rounded-xl p-4 flex items-start justify-between gap-4">
+            <div>
+              <h3 class="font-bold text-white text-sm">{{ especialidadActiva.nombre }} — <span class="text-cyan-accent font-normal">{{ especialidadActiva.especialista }}</span></h3>
+              <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ especialidadActiva.descripcion }}</p>
+              <span class="inline-block text-[11px] text-gray-500 mt-2">🕒 {{ especialidadActiva.horario }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- COLUMNA DERECHA: TARJETA DE ACCESO Y REGISTRO -->
+      <div id="auth-card" class="lg:col-span-5">
+        <div class="bg-dark-panel/95 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-white">Portal de <span class="text-cyan-accent">Pacientes</span></h2>
+            <p class="text-xs text-gray-400 mt-1">Ingresa o crea tu cuenta en segundos</p>
+          </div>
+  
+          <!-- PESTAÑAS INGRESAR / CREAR CUENTA -->
+          <div class="grid grid-cols-2 bg-[#0f172a] p-1 rounded-xl mb-6 border border-gray-800">
+            <button type="button" (click)="alternarModo(false)"
+                    [ngClass]="!modoRegistro ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white'"
+                    class="py-2 rounded-lg text-sm transition-all">
+              Ingresar
+            </button>
+            <button type="button" (click)="alternarModo(true)"
+                    [ngClass]="modoRegistro ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white'"
+                    class="py-2 rounded-lg text-sm transition-all">
+              Crear Cuenta
+            </button>
+          </div>
+  
+          <!-- FORMULARIO LOGIN -->
+          <form *ngIf="!modoRegistro" (ngSubmit)="onLogin()" class="space-y-5">
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-2">CURP (Usuario)</label>
+              <input type="text" [(ngModel)]="curpLogin" name="curpLogin" placeholder="Ej. LOSM060520HMCPNCA0"
+                     class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white uppercase focus:outline-none focus:border-cyan-accent transition-colors">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-2">Contraseña</label>
+              <input type="password" [(ngModel)]="passwordLogin" name="passwordLogin" placeholder="••••••••••"
+                     class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-accent transition-colors">
+            </div>
+            <button type="submit" [disabled]="cargando"
+                    class="w-full bg-cyan-accent text-dark-bg font-bold rounded-lg px-4 py-3 hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(0,229,255,0.25)] disabled:opacity-50">
+              {{ cargando ? 'Conectando...' : 'Ingresar al Portal' }}
+            </button>
+          </form>
+  
+          <!-- FORMULARIO REGISTRO -->
+          <form *ngIf="modoRegistro" (ngSubmit)="onRegister()" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">Nombre Completo</label>
+              <input type="text" [(ngModel)]="registro.nombre_completo" name="nombre" placeholder="Ej. Michael López Sánchez"
+                     class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">CURP</label>
+              <input type="text" [(ngModel)]="registro.curp" name="curpReg" placeholder="18 caracteres"
+                     class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm uppercase focus:outline-none focus:border-cyan-accent">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-300 mb-1">Teléfono</label>
+                <input type="text" [(ngModel)]="registro.telefono" name="telefono" placeholder="7221234567"
+                       class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-300 mb-1">Correo Gmail</label>
+                <input type="email" [(ngModel)]="registro.email" name="email" placeholder="correo@gmail.com"
+                       class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">Crea una Contraseña</label>
+              <input type="password" [(ngModel)]="registro.password" name="passReg" placeholder="••••••••"
+                     class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-accent">
+            </div>
+            <button type="submit" [disabled]="cargando"
+                    class="w-full bg-cyan-accent text-dark-bg font-bold rounded-lg px-4 py-3 hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(0,229,255,0.25)] disabled:opacity-50">
+              {{ cargando ? 'Creando cuenta...' : 'Crear Cuenta' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  
+    <!-- SECCIÓN DE ESPECIALIDADES -->
+    <section id="especialidades" class="max-w-6xl mx-auto px-6 py-14 border-t border-gray-800/70">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <h2 class="text-2xl sm:text-3xl font-bold">Especialidades y <span class="text-cyan-accent">Servicios Clínicos</span></h2>
+        <p class="text-sm text-gray-400 mt-2">Contamos con médicos certificados y equipamiento moderno para brindarte un diagnóstico preciso.</p>
+      </div>
+  
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div *ngFor="let esp of especialidades"
+             class="bg-dark-panel border border-gray-800 hover:border-cyan-accent/50 rounded-2xl p-6 flex flex-col justify-between transition-all group">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-cyan-accent/10 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+              {{ esp.icono }}
+            </div>
+            <h3 class="font-bold text-white text-lg">{{ esp.nombre }}</h3>
+            <p class="text-xs text-cyan-accent mt-1">{{ esp.especialista }}</p>
+            <p class="text-xs text-gray-400 mt-3 leading-relaxed">{{ esp.descripcion }}</p>
+          </div>
+          <button (click)="irARegistroConEspecialidad()" class="mt-5 text-xs font-semibold text-cyan-accent hover:underline text-left">
+            Agendar consulta →
+          </button>
+        </div>
+      </div>
+    </section>
+  
+    <!-- SECCIÓN DE OPINIONES VERIFICADAS -->
+    <section id="opiniones" class="max-w-6xl mx-auto px-6 py-14 border-t border-gray-800/70">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold">Lo que dicen <span class="text-cyan-accent">nuestros pacientes</span></h2>
+          <p class="text-sm text-gray-400 mt-2">Experiencias reales de personas que gestionan sus citas en Clínica Cloud.</p>
+        </div>
+        <div class="bg-dark-panel border border-gray-800 px-4 py-2 rounded-xl text-xs text-gray-300">
+          ⭐⭐⭐⭐⭐ <strong class="text-white ml-1">4.9 / 5.0</strong> basado en reseñas verificadas
+        </div>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div *ngFor="let op of opiniones" class="bg-dark-panel border border-gray-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-cyan-accent/20 text-cyan-accent font-bold flex items-center justify-center text-sm">
+                {{ op.iniciales }}
+              </div>
+              <div>
+                <div class="font-bold text-sm text-white">{{ op.paciente }}</div>
+                <div class="text-[11px] text-gray-400">{{ op.servicio }}</div>
+              </div>
+            </div>
+            <span class="text-yellow-400 text-xs">★★★★★</span>
+          </div>
+          <p class="text-xs text-gray-300 leading-relaxed">"{{ op.comentario }}"</p>
+          <div class="text-[11px] text-gray-500 flex items-center justify-between pt-2 border-t border-gray-800/70">
+            <span>✔ Paciente verificado</span>
+            <span>{{ op.fecha }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- SECCIÓN PREGUNTAS FRECUENTES (ACORDEÓN INTERACTIVO) -->
+    <section id="faq" class="max-w-4xl mx-auto px-6 py-14 border-t border-gray-800/70">
+      <h2 class="text-2xl font-bold text-center mb-8">Preguntas <span class="text-cyan-accent">Frecuentes</span></h2>
+      <div class="space-y-3">
+        <div *ngFor="let item of faqs; let i = index" class="bg-dark-panel border border-gray-800 rounded-xl overflow-hidden">
+          <button type="button" (click)="toggleFaq(i)"
+                  class="w-full px-6 py-4 text-left flex items-center justify-between font-medium text-sm text-white hover:bg-gray-800/40 transition-colors">
+            <span>{{ item.pregunta }}</span>
+            <span class="text-cyan-accent font-bold text-lg">{{ item.abierta ? '−' : '+' }}</span>
+          </button>
+          <div *ngIf="item.abierta" class="px-6 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/60 pt-3">
+            {{ item.respuesta }}
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- PIE DE PÁGINA -->
+    <footer class="border-t border-gray-800 py-8 px-6 text-center text-xs text-gray-500">
+      <p>Clínica Cloud • Toluca / Metepec, Estado de México • Atención de Lunes a Domingo</p>
+    </footer>
   
     <!-- ACCESO DISCRETO / ESCONDIDO PARA ADMINISTRACIÓN -->
     <a routerLink="/admin" title="Acceso administrativo"
-       class="fixed bottom-4 right-4 text-gray-600 opacity-20 hover:opacity-90 hover:text-cyan-accent transition-opacity p-2 rounded-full">
+       class="fixed bottom-4 right-4 text-gray-600 opacity-20 hover:opacity-90 hover:text-cyan-accent transition-opacity p-2 rounded-full z-40">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
       </svg>

@@ -1,69 +1,278 @@
-<div class="min-h-screen bg-dark-bg text-white p-6">
-    <div class="max-w-4xl mx-auto space-y-6">
-      <!-- BARRA SUPERIOR -->
-      <header class="bg-dark-panel border border-gray-800 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 class="text-xl font-bold flex items-center gap-2">
-            <span class="text-cyan-accent">✚</span> Mi Portal Clínico
-          </h1>
-          <p class="text-sm text-gray-400 mt-1" *ngIf="paciente">
-            Bienvenido, <span class="text-white font-medium">{{ paciente.nombre_completo }}</span> ({{ paciente.curp }})
-          </p>
+<div class="min-h-screen bg-dark-bg text-white p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto space-y-6">
+  
+      <!-- CABECERA DEL PACIENTE -->
+      <header class="bg-dark-panel border border-gray-800 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-accent/15 border border-cyan-accent/40 flex items-center justify-center text-cyan-accent font-bold text-xl">
+            ✚
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl font-bold">Mi Portal Clínico</h1>
+              <span class="text-[11px] bg-green-500/15 text-green-400 px-2.5 py-0.5 rounded-full border border-green-500/30">
+                Expediente Activo
+              </span>
+            </div>
+            <p class="text-sm text-gray-400 mt-1" *ngIf="paciente">
+              Hola, <span class="text-white font-semibold">{{ paciente.nombre_completo }}</span> • CURP: <span class="text-cyan-accent">{{ paciente.curp }}</span>
+            </p>
+          </div>
         </div>
-        <button (click)="cerrarSesion()" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm transition-colors">
+  
+        <button (click)="cerrarSesion()" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
           Cerrar Sesión
         </button>
       </header>
   
-      <!-- AGENDAR NUEVA CITA -->
-      <section class="bg-dark-panel border border-gray-800 rounded-2xl p-6 shadow-lg">
-        <h2 class="text-lg font-bold mb-4">Agendar Nueva Cita Médica</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- MENÚ DE PESTAÑAS INTERACTIVAS -->
+      <div class="grid grid-cols-3 bg-dark-panel p-1.5 rounded-2xl border border-gray-800 gap-1.5">
+        <button type="button" (click)="tabActiva = 'agendar'"
+                [ngClass]="tabActiva === 'agendar' ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white hover:bg-gray-800/40'"
+                class="py-2.5 px-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
+          <span>📅</span> Agendar Nueva Cita
+        </button>
+        <button type="button" (click)="tabActiva = 'citas'"
+                [ngClass]="tabActiva === 'citas' ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white hover:bg-gray-800/40'"
+                class="py-2.5 px-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
+          <span>🗂️</span> Mis Citas ({{ citas.length }})
+        </button>
+        <button type="button" (click)="tabActiva = 'opiniones'"
+                [ngClass]="tabActiva === 'opiniones' ? 'bg-cyan-accent text-dark-bg font-bold shadow' : 'text-gray-400 hover:text-white hover:bg-gray-800/40'"
+                class="py-2.5 px-3 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
+          <span>⭐</span> Opiniones
+        </button>
+      </div>
+  
+      <!-- PESTAÑA 1: AGENDAR NUEVA CITA CON MENÚS DESPLEGABLES PERSONALIZADOS -->
+      <section *ngIf="tabActiva === 'agendar'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  
+        <!-- COLUMNA IZQUIERDA: SELECTORES INTERACTIVOS -->
+        <div class="lg:col-span-7 bg-dark-panel border border-gray-800 rounded-2xl p-6 space-y-6 shadow-lg">
           <div>
-            <label class="block text-xs text-gray-400 mb-1">Fecha y Hora deseada</label>
-            <input type="datetime-local" [(ngModel)]="nuevaCita.fecha_hora"
-                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:border-cyan-accent focus:outline-none">
+            <h2 class="text-lg font-bold text-white">Configura tu Consulta Médica</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Selecciona el servicio y el horario que prefieras</p>
           </div>
+  
+          <!-- 1. MENÚ DESPLEGABLE ATRACTIVO PARA MOTIVO DE CITA -->
+          <div class="relative">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              1. Motivo o Especialidad de Consulta
+            </label>
+  
+            <!-- BOTÓN DISPARADOR DEL MENÚ -->
+            <button type="button" (click)="menuMotivosAbierto = !menuMotivosAbierto; menuFechaAbierto = false"
+                    class="w-full bg-[#0f172a] border border-gray-700 hover:border-cyan-accent rounded-xl p-4 flex items-center justify-between transition-all text-left">
+              <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-cyan-accent/15 border border-cyan-accent/30 flex items-center justify-center text-2xl">
+                  {{ motivoSeleccionado.icono }}
+                </div>
+                <div>
+                  <div class="font-bold text-white text-sm">{{ motivoSeleccionado.titulo }}</div>
+                  <div class="text-xs text-cyan-accent mt-0.5">{{ motivoSeleccionado.doctor }} • {{ motivoSeleccionado.duracion }}</div>
+                </div>
+              </div>
+              <span class="text-cyan-accent text-sm font-bold transition-transform" [ngClass]="{'rotate-180': menuMotivosAbierto}">
+                ▼
+              </span>
+            </button>
+  
+            <!-- LISTA DESPLEGABLE PERSONALIZADA -->
+            <div *ngIf="menuMotivosAbierto"
+                 class="mt-2 bg-[#0b1220] border border-cyan-accent/40 rounded-2xl p-2 shadow-2xl space-y-1.5 z-20">
+              <button *ngFor="let item of motivosDisponibles" type="button" (click)="seleccionarMotivo(item)"
+                      [ngClass]="motivoSeleccionado.id === item.id ? 'bg-cyan-accent/15 border-cyan-accent/50' : 'hover:bg-gray-800/60 border-transparent'"
+                      class="w-full p-3 rounded-xl border text-left flex items-start gap-3 transition-all">
+                <span class="text-2xl mt-0.5">{{ item.icono }}</span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-white">{{ item.titulo }}</span>
+                    <span class="text-[11px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded-md">{{ item.duracion }}</span>
+                  </div>
+                  <div class="text-xs text-cyan-accent">{{ item.doctor }}</div>
+                  <p class="text-[11px] text-gray-400 mt-1">{{ item.descripcion }}</p>
+                </div>
+              </button>
+            </div>
+          </div>
+  
+          <!-- 2. MENÚ DESPLEGABLE ATRACTIVO PARA FECHA Y HORARIO -->
           <div>
-            <label class="block text-xs text-gray-400 mb-1">Motivo de consulta</label>
-            <input type="text" [(ngModel)]="nuevaCita.motivo" placeholder="Ej. Consulta general / Revisión"
-                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:border-cyan-accent focus:outline-none">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              2. Fecha y Horario Disponible
+            </label>
+  
+            <!-- BOTÓN DISPARADOR DE FECHA Y HORA -->
+            <button type="button" (click)="menuFechaAbierto = !menuFechaAbierto; menuMotivosAbierto = false"
+                    class="w-full bg-[#0f172a] border border-gray-700 hover:border-cyan-accent rounded-xl p-4 flex items-center justify-between transition-all text-left">
+              <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-blue-500/15 border border-blue-400/30 flex items-center justify-center text-xl">
+                  📆
+                </div>
+                <div>
+                  <div class="font-bold text-white text-sm">{{ fechaSeleccionada?.etiquetaCompleta }}</div>
+                  <div class="text-xs text-cyan-accent mt-0.5">Horario seleccionado: {{ horaSeleccionada }} hrs</div>
+                </div>
+              </div>
+              <span class="text-xs bg-cyan-accent/15 text-cyan-accent px-3 py-1 rounded-lg font-semibold">
+                {{ menuFechaAbierto ? 'Cerrar' : 'Cambiar' }}
+              </span>
+            </button>
+  
+            <!-- PANEL DESPLEGABLE DE DÍAS Y HORAS -->
+            <div *ngIf="menuFechaAbierto"
+                 class="mt-2 bg-[#0b1220] border border-cyan-accent/40 rounded-2xl p-4 shadow-2xl space-y-4">
+              <div>
+                <div class="text-xs text-gray-400 mb-2 font-medium">Selecciona un día:</div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button *ngFor="let dia of diasDisponibles" type="button" (click)="seleccionarFecha(dia)"
+                          [ngClass]="fechaSeleccionada?.fechaISO === dia.fechaISO ? 'bg-cyan-accent text-dark-bg font-bold border-cyan-accent shadow-[0_0_12px_rgba(0,229,255,0.3)]' : 'bg-[#0f172a] text-gray-300 border-gray-800 hover:border-gray-600'"
+                          class="p-2.5 rounded-xl border text-center transition-all">
+                    <div class="text-[10px] uppercase opacity-80">{{ dia.diaSemana }}</div>
+                    <div class="text-base font-extrabold leading-tight my-0.5">{{ dia.diaNumero }}</div>
+                    <div class="text-[10px] opacity-80">{{ dia.mes }}</div>
+                  </button>
+                </div>
+              </div>
+  
+              <div>
+                <div class="text-xs text-gray-400 mb-2 font-medium">Horarios disponibles para ese día:</div>
+                <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  <button *ngFor="let hora of horariosDisponibles" type="button" (click)="seleccionarHora(hora)"
+                          [ngClass]="horaSeleccionada === hora ? 'bg-cyan-accent text-dark-bg font-bold border-cyan-accent' : 'bg-[#0f172a] text-gray-300 border-gray-800 hover:border-cyan-accent/50'"
+                          class="py-2 px-3 rounded-xl border text-xs transition-all">
+                    🕒 {{ hora }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- 3. NOTAS O SÍNTOMAS OPCIONALES -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              3. Notas o síntomas adicionales (Opcional)
+            </label>
+            <input type="text" [(ngModel)]="notasAdicionales" placeholder="Ej. Chequeo de rutina, dolor leve de garganta..."
+                   class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-accent focus:outline-none">
           </div>
         </div>
-        <button (click)="agendarCita()" [disabled]="enviando"
-                class="mt-4 bg-cyan-accent text-dark-bg font-bold px-6 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50">
-          {{ enviando ? 'Agendando...' : 'Confirmar Cita (Enviar a mi Gmail)' }}
-        </button>
+  
+        <!-- COLUMNA DERECHA: TICKET DE RESUMEN EN VIVO -->
+        <div class="lg:col-span-5">
+          <div class="bg-gradient-to-b from-dark-panel to-[#0b1220] border border-cyan-accent/30 rounded-2xl p-6 shadow-xl space-y-5 sticky top-6">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+              <h3 class="font-bold text-white">Resumen de tu Cita</h3>
+              <span class="text-[11px] bg-cyan-accent/15 text-cyan-accent px-2.5 py-0.5 rounded-full">Notificación Gmail</span>
+            </div>
+  
+            <div class="space-y-3.5 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Servicio:</span>
+                <span class="font-semibold text-white text-right">{{ motivoSeleccionado.titulo }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Especialista:</span>
+                <span class="text-cyan-accent font-medium">{{ motivoSeleccionado.doctor }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Fecha:</span>
+                <span class="text-white font-medium">{{ fechaSeleccionada?.etiquetaCompleta }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Hora:</span>
+                <span class="text-white font-bold">{{ horaSeleccionada }} hrs</span>
+              </div>
+              <div class="flex justify-between" *ngIf="paciente">
+                <span class="text-gray-400">Envío a correo:</span>
+                <span class="text-gray-300 text-xs">{{ paciente.email }}</span>
+              </div>
+            </div>
+  
+            <div class="bg-[#0f172a] border border-gray-800 rounded-xl p-3.5 text-xs text-gray-400 leading-relaxed">
+              Al confirmar, tu cita quedará registrada en nuestro sistema y recibirás un correo de respaldo inmediato.
+            </div>
+  
+            <button type="button" (click)="agendarCita()" [disabled]="enviando"
+                    class="w-full bg-cyan-accent text-dark-bg font-bold py-3.5 px-6 rounded-xl hover:bg-cyan-400 transition-all shadow-[0_0_25px_rgba(0,229,255,0.3)] disabled:opacity-50">
+              {{ enviando ? 'Confirmando y enviando correo...' : '✔ Confirmar Cita Médica' }}
+            </button>
+          </div>
+        </div>
       </section>
   
-      <!-- HISTORIAL DE MIS CITAS -->
-      <section class="bg-dark-panel border border-gray-800 rounded-2xl overflow-hidden">
-        <div class="p-6 border-b border-gray-800">
-          <h2 class="text-lg font-bold">Mis Citas Agendadas</h2>
+      <!-- PESTAÑA 2: MIS CITAS AGENDADAS -->
+      <section *ngIf="tabActiva === 'citas'" class="bg-dark-panel border border-gray-800 rounded-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Historial de Mis Citas</h2>
+          <button (click)="tabActiva = 'agendar'" class="text-xs bg-cyan-accent/15 text-cyan-accent hover:bg-cyan-accent/25 px-3 py-1.5 rounded-lg font-semibold">
+            + Nueva Cita
+          </button>
         </div>
-        <table class="w-full text-left text-sm text-gray-400">
-          <thead class="bg-gray-800/50 text-gray-300 uppercase">
-            <tr>
-              <th class="px-6 py-3">Folio</th>
-              <th class="px-6 py-3">Fecha y Hora</th>
-              <th class="px-6 py-3">Motivo</th>
-              <th class="px-6 py-3">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let c of citas" class="border-b border-gray-800">
-              <td class="px-6 py-4">#{{ c.id }}</td>
-              <td class="px-6 py-4 text-white">{{ c.fecha_hora | date:'medium' }}</td>
-              <td class="px-6 py-4">{{ c.motivo }}</td>
-              <td class="px-6 py-4">
-                <span class="bg-green-500/20 text-green-400 px-2.5 py-1 rounded text-xs font-bold uppercase">{{ c.estado }}</span>
-              </td>
-            </tr>
-            <tr *ngIf="citas.length === 0">
-              <td colspan="4" class="text-center py-8 text-gray-500">Aún no tienes citas registradas.</td>
-            </tr>
-          </tbody>
-        </table>
+  
+        <div *ngIf="citas.length === 0" class="text-center py-12 text-gray-500 text-sm">
+          Aún no tienes citas registradas. ¡Agenda tu primera consulta en segundos!
+        </div>
+  
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngFor="let c of citas" class="bg-[#0f172a] border border-gray-800 rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono text-cyan-accent">FOLIO #{{ c.id }}</span>
+              <span class="bg-green-500/20 text-green-400 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase">
+                {{ c.estado }}
+              </span>
+            </div>
+            <div class="font-bold text-white text-base">{{ c.motivo }}</div>
+            <div class="text-xs text-gray-400">
+              📅 {{ c.fecha_hora | date:'fullDate' }} • 🕒 {{ c.fecha_hora | date:'shortTime' }}
+            </div>
+          </div>
+        </div>
       </section>
+  
+      <!-- PESTAÑA 3: OPINIONES DE PACIENTES -->
+      <section *ngIf="tabActiva === 'opiniones'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-dark-panel border border-gray-800 rounded-2xl p-6 space-y-4 h-fit">
+          <h2 class="text-lg font-bold">Comparte tu Experiencia</h2>
+          <p class="text-xs text-gray-400">Tu opinión ayuda a otros pacientes a sentirse seguros con nuestra atención.</p>
+  
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">Calificación</label>
+            <div class="flex gap-2">
+              <button *ngFor="let star of [1,2,3,4,5]" type="button" (click)="nuevaOpinion.estrellas = star"
+                      [ngClass]="nuevaOpinion.estrellas >= star ? 'text-yellow-400 border-yellow-400/50 bg-yellow-400/10' : 'text-gray-600 border-gray-800'"
+                      class="px-3 py-1.5 rounded-lg border text-sm font-bold transition-all">
+                ★ {{ star }}
+              </button>
+            </div>
+          </div>
+  
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">Tu comentario</label>
+            <textarea [(ngModel)]="nuevaOpinion.comentario" rows="3" placeholder="Cuéntanos cómo fue tu atención..."
+                      class="w-full bg-[#0f172a] border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-cyan-accent focus:outline-none"></textarea>
+          </div>
+  
+          <button type="button" (click)="publicarOpinion()"
+                  class="w-full bg-cyan-accent text-dark-bg font-bold py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">
+            Publicar Reseña
+          </button>
+        </div>
+  
+        <div class="lg:col-span-7 space-y-4">
+          <div *ngFor="let op of opinionesClinica" class="bg-dark-panel border border-gray-800 rounded-2xl p-5 space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-bold text-sm text-white">{{ op.autor }}</span>
+                <span class="text-xs text-cyan-accent ml-2">• {{ op.servicio }}</span>
+              </div>
+              <span class="text-yellow-400 text-xs">★★★★★</span>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">"{{ op.comentario }}"</p>
+            <div class="text-[11px] text-gray-500">{{ op.fecha }}</div>
+          </div>
+        </div>
+      </section>
+  
     </div>
   </div>
