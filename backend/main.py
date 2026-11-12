@@ -2,6 +2,7 @@ import smtplib
 from email.mime.text import MIMEText
 from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware # <-- AGREGAR ESTA LÍNEA
 from sqlmodel import Session, select
 import jwt
 
@@ -10,6 +11,18 @@ from models import Usuario, Paciente, Cita
 from auth import verify_password, create_access_token, get_password_hash, SECRET_KEY, ALGORITHM
 
 app = FastAPI(title="API Clínica Privada - Cloud")
+
+# ==========================================
+# CONFIGURACIÓN CORS (OBLIGATORIO)
+# ==========================================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # ==========================================

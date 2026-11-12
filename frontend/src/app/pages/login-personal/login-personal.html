@@ -1,0 +1,31 @@
+<div class="min-h-screen flex items-center justify-center bg-dark-bg p-4 relative overflow-hidden">
+    <div class="absolute top-[20%] right-[20%] w-72 h-72 bg-purple-500/20 rounded-full blur-[100px]"></div>
+  
+    <div class="max-w-md w-full bg-dark-panel backdrop-blur-md border-t-4 border-cyan-accent rounded-2xl p-8 shadow-2xl relative z-10">
+      <div class="text-center mb-8">
+        <div class="inline-block bg-cyan-accent/20 p-3 rounded-full mb-4">
+          <svg class="w-8 h-8 text-cyan-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-2">Acceso a la <span class="text-cyan-accent">Clínica</span></h1>
+        <p class="text-sm text-gray-400">Área restringida (Médicos y Recepción)</p>
+      </div>
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Nombre de Usuario</label>
+          <input type="text" [(ngModel)]="username" name="username" class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-accent transition-colors" placeholder="Ej. admin">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+          <input type="password" [(ngModel)]="password" name="password" class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-accent transition-colors" placeholder="••••••••">
+        </div>
+        <button type="button" (click)="onLogin()" class="w-full bg-transparent border-2 border-cyan-accent text-cyan-accent font-bold rounded-lg px-4 py-3 hover:bg-cyan-accent hover:text-dark-bg transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)]">
+          Conectar Sistema
+        </button>
+  
+        <div class="text-center mt-4">
+          <a href="/pacientes" class="text-sm text-gray-500 hover:text-white transition-colors">← Regresar a Pacientes</a>
+        </div>
+      </div>
+    </div>
+  </div>

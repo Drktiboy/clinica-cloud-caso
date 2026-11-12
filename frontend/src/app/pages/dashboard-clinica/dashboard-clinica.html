@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-dark-bg flex">
+  
+    <!-- MENÚ LATERAL (SIDEBAR) -->
+    <aside class="w-64 bg-dark-panel border-r border-gray-800 flex flex-col">
+      <div class="p-6 border-b border-gray-800">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <span class="text-cyan-accent">✚</span> Clínica Cloud
+        </h2>
+        <p class="text-xs text-gray-500 mt-1">Panel de Administración</p>
+      </div>
+      
+      <nav class="flex-1 p-4 space-y-2">
+        <button (click)="cambiarVista('pacientes')" 
+                [ngClass]="{'bg-cyan-accent/10 text-cyan-accent border-r-4 border-cyan-accent': vistaActual === 'pacientes', 'text-gray-400 hover:bg-gray-800': vistaActual !== 'pacientes'}"
+                class="w-full text-left px-4 py-3 rounded-lg font-medium transition-colors">
+          👥 Gestión de Pacientes
+        </button>
+        <button (click)="cambiarVista('citas')" 
+                [ngClass]="{'bg-cyan-accent/10 text-cyan-accent border-r-4 border-cyan-accent': vistaActual === 'citas', 'text-gray-400 hover:bg-gray-800': vistaActual !== 'citas'}"
+                class="w-full text-left px-4 py-3 rounded-lg font-medium transition-colors">
+          📅 Agenda de Citas
+        </button>
+      </nav>
+  
+      <div class="p-4 border-t border-gray-800">
+        <button (click)="cerrarSesion()" class="w-full bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+          Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+  
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      
+      <!-- VISTA PACIENTES -->
+      <div *ngIf="vistaActual === 'pacientes'" class="space-y-6">
+        <div class="bg-dark-panel p-6 rounded-xl border border-gray-800 shadow-lg">
+          <h3 class="text-lg font-bold text-white mb-4">Registrar Nuevo Paciente</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" [(ngModel)]="nuevoPaciente.nombre_completo" placeholder="Nombre Completo" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+            <input type="text" [(ngModel)]="nuevoPaciente.curp" placeholder="CURP" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+            <input type="text" [(ngModel)]="nuevoPaciente.telefono" placeholder="Teléfono" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+            <input type="email" [(ngModel)]="nuevoPaciente.email" placeholder="Correo Electrónico" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+          </div>
+          <button (click)="registrarPaciente()" class="mt-4 bg-cyan-accent text-dark-bg font-bold px-6 py-2 rounded-lg hover:bg-cyan-400 transition-colors">Guardar Paciente</button>
+        </div>
+  
+        <div class="bg-dark-panel rounded-xl border border-gray-800 overflow-hidden">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead class="bg-gray-800/50 text-gray-300 uppercase">
+              <tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Nombre</th><th class="px-6 py-4">CURP</th><th class="px-6 py-4">Email</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of pacientes" class="border-b border-gray-800 hover:bg-gray-800/30">
+                <td class="px-6 py-4">#{{ p.id }}</td><td class="px-6 py-4 font-medium text-white">{{ p.nombre_completo }}</td><td class="px-6 py-4">{{ p.curp }}</td><td class="px-6 py-4">{{ p.email }}</td>
+              </tr>
+              <tr *ngIf="pacientes.length === 0"><td colspan="4" class="text-center py-8">No hay pacientes registrados</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  
+      <!-- VISTA CITAS -->
+      <div *ngIf="vistaActual === 'citas'" class="space-y-6">
+        <div class="bg-dark-panel p-6 rounded-xl border border-gray-800 shadow-lg">
+          <h3 class="text-lg font-bold text-white mb-4">Agendar Cita (Dispara Correo Gmail)</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <select [(ngModel)]="nuevaCita.paciente_id" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+              <option [ngValue]="null" disabled selected>Selecciona un paciente</option>
+              <option *ngFor="let p of pacientes" [value]="p.id">{{ p.nombre_completo }}</option>
+            </select>
+            <input type="datetime-local" [(ngModel)]="nuevaCita.fecha_hora" class="bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+            <input type="text" [(ngModel)]="nuevaCita.motivo" placeholder="Motivo de la consulta" class="md:col-span-2 bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-cyan-accent focus:outline-none">
+          </div>
+          <button (click)="agendarCita()" class="mt-4 bg-cyan-accent text-dark-bg font-bold px-6 py-2 rounded-lg hover:bg-cyan-400 transition-colors">Agendar Cita</button>
+        </div>
+  
+        <div class="bg-dark-panel rounded-xl border border-gray-800 overflow-hidden">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead class="bg-gray-800/50 text-gray-300 uppercase">
+              <tr><th class="px-6 py-4">ID Cita</th><th class="px-6 py-4">ID Paciente</th><th class="px-6 py-4">Fecha/Hora</th><th class="px-6 py-4">Motivo</th><th class="px-6 py-4">Estado</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of citas" class="border-b border-gray-800 hover:bg-gray-800/30">
+                <td class="px-6 py-4">#{{ c.id }}</td><td class="px-6 py-4 font-medium text-white">#{{ c.paciente_id }}</td><td class="px-6 py-4">{{ c.fecha_hora | date:'short' }}</td><td class="px-6 py-4">{{ c.motivo }}</td>
+                <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold uppercase">{{ c.estado }}</span></td>
+              </tr>
+              <tr *ngIf="citas.length === 0"><td colspan="5" class="text-center py-8">No hay citas agendadas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  
+    </main>
+  </div>
