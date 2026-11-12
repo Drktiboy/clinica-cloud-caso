@@ -6,15 +6,13 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  // URL base de tu API (cambiará por la URL pública de Render en producción)
   private apiUrl = 'https://clinica-cloud-api.onrender.com';
 
   constructor(private http: HttpClient) {}
 
-  // Autenticación JWT (Endpoint /token)
   login(username: string, password: string): Observable<any> {
     const body = new HttpParams()
-      .set('username', username)
+      .set('username', username.trim())
       .set('password', password);
 
     const headers = new HttpHeaders({
@@ -24,11 +22,17 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/token`, body.toString(), { headers });
   }
 
-  // Obtener citas (Protegido con JWT)
-  getCitas(token: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    return this.http.get(`${this.apiUrl}/citas/`, { headers });
+  registrarCuentaPaciente(datos: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/registro-paciente`, datos);
+  }
+
+  getMisCitas(token: string): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.get(`${this.apiUrl}/mis-citas`, { headers });
+  }
+
+  agendarMiCita(token: string, datos: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.post(`${this.apiUrl}/mis-citas`, datos, { headers });
   }
 }

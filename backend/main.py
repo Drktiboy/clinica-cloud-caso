@@ -5,6 +5,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware # <-- AGREGAR ESTA LÍNEA
 from sqlmodel import Session, select
 import jwt
+from datetime import datetime
+from pydantic import BaseModel
 
 from database import engine, create_db_and_tables, get_session
 from models import Usuario, Paciente, Cita
@@ -140,3 +142,75 @@ def extraccion_etl_iaas(user: dict = Depends(obtener_usuario_actual), session: S
         raise HTTPException(status_code=403, detail="Acceso denegado. Solo IaaS/Admin.")
     citas = session.exec(select(Cita)).all()
     return {"total_citas": len(citas), "datos": citas}
+
+class RegistroPacienteIn(BaseModel):
+    nombre_completo: str
+    curp: str
+    telefono: str
+    email: str
+    password: str
+
+class NuevaCitaPacienteIn(BaseModel):
+    fecha_hora: str
+    motivo: str
+
+@app.post("/registro-paciente", status_code=201)
+def registro_publico_paciente(datos: RegistroPacienteIn, session: Session = Depends(get_session)):
+    """Crea cuenta de paciente (Usuario con rol paciente + registro en tabla Paciente)"""
+    curp_limpio = datos.curp.strip().upper()
+    existe = session.exec(select(Usuario).where(Usuario.username == curp_limpio)).first()
+    if existe:
+        raise HTTPException(status_code=400, detail="Ya existe una cuenta registrada con esta CURP")
+
+    nuevo_usuario = Usuario(
+        username=curp_limpio,
+        password_hash=get_password_hash(datos.password),
+        rol="paciente",
+        email=datos.email
+    )
+    session.add(nuevo_usuario)
+
+    existe_paciente = session.exec(select(Paciente).where(Paciente.curp == curp_limpio)).first()
+    if not existe_paciente:
+        nuevo_paciente = Paciente(
+            nombre_completo=datos.nombre_completo,
+            curp=curp_limpio,
+            telefono=datos.telefono,
+            email=datos.email
+        )
+        session.add(nuevo_paciente)
+
+    session.commit()
+    return {"mensaje": "Cuenta de paciente creada exitosamente"}
+
+@app.get("/mis-citas")
+def obtener_mis_citas(user: dict = Depends(obtener_usuario_actual), session: Session = Depends(get_session)):
+    """Devuelve el perfil y las citas del paciente autenticado"""
+    paciente = session.exec(select(Paciente).where(Paciente.curp == user["username"])).first()
+    if not paciente:
+        return {"paciente": None, "citas": []}
+    citas = session.exec(select(Cita).where(Cita.paciente_id == paciente.id)).all()
+    return {"paciente": paciente, "citas": citas}
+
+@app.post("/mis-citas", status_code=201)
+def agendar_cita_paciente(datos: NuevaCitaPacienteIn, background_tasks: BackgroundTasks, user: dict = Depends(obtener_usuario_actual), session: Session = Depends(get_session)):
+    """Permite al paciente agendar su propia cita y dispara notificación SaaS"""
+    paciente = session.exec(select(Paciente).where(Paciente.curp == user["username"])).first()
+    if not paciente:
+        raise HTTPException(status_code=404, detail="Perfil de paciente no encontrado")
+
+    fecha_dt = datetime.fromisoformat(datos.fecha_hora.replace("Z", "+00:00"))
+    nueva_cita = Cita(
+        paciente_id=paciente.id,
+        medico_id=1,
+        fecha_hora=fecha_dt,
+        motivo=datos.motivo
+    )
+    session.add(nueva_cita)
+    session.commit()
+    session.refresh(nueva_cita)
+
+    mensaje = f"Hola {paciente.nombre_completo}, su cita ha sido agendada para el {nueva_cita.fecha_hora}. Motivo: {nueva_cita.motivo}"
+    background_tasks.add_task(enviar_correo_gmail, paciente.email, mensaje)
+
+    return {"mensaje": "Cita agendada y confirmación enviada a tu correo", "cita": nueva_cita}

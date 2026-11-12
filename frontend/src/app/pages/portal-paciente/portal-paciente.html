@@ -1,0 +1,69 @@
+<div class="min-h-screen bg-dark-bg text-white p-6">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <!-- BARRA SUPERIOR -->
+      <header class="bg-dark-panel border border-gray-800 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-bold flex items-center gap-2">
+            <span class="text-cyan-accent">✚</span> Mi Portal Clínico
+          </h1>
+          <p class="text-sm text-gray-400 mt-1" *ngIf="paciente">
+            Bienvenido, <span class="text-white font-medium">{{ paciente.nombre_completo }}</span> ({{ paciente.curp }})
+          </p>
+        </div>
+        <button (click)="cerrarSesion()" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm transition-colors">
+          Cerrar Sesión
+        </button>
+      </header>
+  
+      <!-- AGENDAR NUEVA CITA -->
+      <section class="bg-dark-panel border border-gray-800 rounded-2xl p-6 shadow-lg">
+        <h2 class="text-lg font-bold mb-4">Agendar Nueva Cita Médica</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Fecha y Hora deseada</label>
+            <input type="datetime-local" [(ngModel)]="nuevaCita.fecha_hora"
+                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:border-cyan-accent focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Motivo de consulta</label>
+            <input type="text" [(ngModel)]="nuevaCita.motivo" placeholder="Ej. Consulta general / Revisión"
+                   class="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:border-cyan-accent focus:outline-none">
+          </div>
+        </div>
+        <button (click)="agendarCita()" [disabled]="enviando"
+                class="mt-4 bg-cyan-accent text-dark-bg font-bold px-6 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50">
+          {{ enviando ? 'Agendando...' : 'Confirmar Cita (Enviar a mi Gmail)' }}
+        </button>
+      </section>
+  
+      <!-- HISTORIAL DE MIS CITAS -->
+      <section class="bg-dark-panel border border-gray-800 rounded-2xl overflow-hidden">
+        <div class="p-6 border-b border-gray-800">
+          <h2 class="text-lg font-bold">Mis Citas Agendadas</h2>
+        </div>
+        <table class="w-full text-left text-sm text-gray-400">
+          <thead class="bg-gray-800/50 text-gray-300 uppercase">
+            <tr>
+              <th class="px-6 py-3">Folio</th>
+              <th class="px-6 py-3">Fecha y Hora</th>
+              <th class="px-6 py-3">Motivo</th>
+              <th class="px-6 py-3">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of citas" class="border-b border-gray-800">
+              <td class="px-6 py-4">#{{ c.id }}</td>
+              <td class="px-6 py-4 text-white">{{ c.fecha_hora | date:'medium' }}</td>
+              <td class="px-6 py-4">{{ c.motivo }}</td>
+              <td class="px-6 py-4">
+                <span class="bg-green-500/20 text-green-400 px-2.5 py-1 rounded text-xs font-bold uppercase">{{ c.estado }}</span>
+              </td>
+            </tr>
+            <tr *ngIf="citas.length === 0">
+              <td colspan="4" class="text-center py-8 text-gray-500">Aún no tienes citas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>

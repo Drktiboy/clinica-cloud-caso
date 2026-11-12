@@ -1,11 +1,14 @@
+import os
 from sqlmodel import SQLModel, create_engine, Session
 
-# Utilizamos SQLite local para garantizar un costo de $0 MXN y alta disponibilidad en Render
-sqlite_file_name = "clinica_privada.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./clinica_privada.db")
 
-# El parámetro check_same_thread es necesario en FastAPI cuando se usa SQLite
-engine = create_engine(sqlite_url, echo=True, connect_args={"check_same_thread": False})
+# Render entrega URLs con "postgres://", pero SQLAlchemy requiere "postgresql://"
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
