@@ -1,6 +1,6 @@
 {
     "buildCommand": "npm run build",
-    "outputDirectory": "dist/frontend/browser",
+    "outputDirectory": "dist/clinica-app/browser",
     "rewrites": [
       { "source": "/(.*)", "destination": "/index.html" }
     ]

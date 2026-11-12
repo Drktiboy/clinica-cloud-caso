@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -12,25 +12,31 @@ import { Router } from '@angular/router';
   styleUrls: ['./dashboard-clinica.css']
 })
 export class DashboardClinicaComponent implements OnInit {
-  // Variables para la vista
   vistaActual = 'pacientes';
   pacientes: any[] = [];
   citas: any[] = [];
   
-  // Modelos para formularios
   nuevoPaciente = { nombre_completo: '', curp: '', telefono: '', email: '' };
   nuevaCita = { paciente_id: null, medico_id: 1, fecha_hora: '', motivo: '' };
 
   private apiUrl = 'https://clinica-cloud-api.onrender.com';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
-    this.cargarDatos();
+    if (isPlatformBrowser(this.platformId)) {
+      this.cargarDatos();
+    }
   }
 
-  // Función para inyectar el token JWT en cada petición
   private getHeaders() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return new HttpHeaders();
+    }
     const token = localStorage.getItem('token');
     if (!token) {
       this.router.navigate(['/admin']);
@@ -44,17 +50,17 @@ export class DashboardClinicaComponent implements OnInit {
   }
 
   cerrarSesion() {
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
     this.router.navigate(['/admin']);
   }
 
   cargarDatos() {
     const headers = this.getHeaders();
-    // Cargar Pacientes
     this.http.get<any[]>(`${this.apiUrl}/pacientes/`, { headers }).subscribe(res => {
       this.pacientes = res;
     });
-    // Cargar Citas
     this.http.get<any[]>(`${this.apiUrl}/citas/`, { headers }).subscribe(res => {
       this.citas = res;
     });
@@ -66,15 +72,14 @@ export class DashboardClinicaComponent implements OnInit {
       next: () => {
         alert('Paciente registrado con éxito');
         this.nuevoPaciente = { nombre_completo: '', curp: '', telefono: '', email: '' };
-        this.cargarDatos(); // Recarga la tabla
+        this.cargarDatos();
       },
-      error: (err) => alert('Error al registrar paciente')
+      error: () => alert('Error al registrar paciente')
     });
   }
 
   agendarCita() {
     const headers = this.getHeaders();
-    // Ajuste de formato de fecha ISO para FastAPI
     const citaPayload = {
       ...this.nuevaCita,
       fecha_hora: new Date(this.nuevaCita.fecha_hora).toISOString()
@@ -86,7 +91,7 @@ export class DashboardClinicaComponent implements OnInit {
         this.nuevaCita = { paciente_id: null, medico_id: 1, fecha_hora: '', motivo: '' };
         this.cargarDatos();
       },
-      error: (err) => alert('Error al agendar cita')
+      error: () => alert('Error al agendar cita')
     });
   }
 }
