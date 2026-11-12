@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   // URL base de tu API (cambiará por la URL pública de Render en producción)
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = 'https://clinica-cloud-api.onrender.com';
 
   constructor(private http: HttpClient) {}
 

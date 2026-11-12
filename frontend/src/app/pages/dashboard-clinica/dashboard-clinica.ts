@@ -21,7 +21,7 @@ export class DashboardClinicaComponent implements OnInit {
   nuevoPaciente = { nombre_completo: '', curp: '', telefono: '', email: '' };
   nuevaCita = { paciente_id: null, medico_id: 1, fecha_hora: '', motivo: '' };
 
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = 'https://clinica-cloud-api.onrender.com';
 
   constructor(private http: HttpClient, private router: Router) {}
 
